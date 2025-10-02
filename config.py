@@ -11,3 +11,5 @@ else:
 TOKEN = os.getenv("TOKEN")
 YANDEX_DISK_PATH = os.getenv("YANDEX_DISK_PATH")
 LOCAL_FOLDER = os.getenv("LOCAL_FOLDER")
+LOG_PATH = os.getenv("LOG_PATH")
+SYNC_PERIOD = os.getenv("SYNC_PERIOD")
