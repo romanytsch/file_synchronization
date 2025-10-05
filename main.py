@@ -19,8 +19,7 @@ logging.basicConfig(
 
 
 def main():
-    start_time = time.strftime("%Y-%m-%d %H:%M:%S")
-    logging.info(f"Программа запущена в {start_time}, синхронизируемая папка: {LOCAL_FOLDER}")
+    logging.info(f"Программа запущена, синхронизируемая папка: {LOCAL_FOLDER}")
 
     # Проверка локальной папки
     if not os.path.exists(LOCAL_FOLDER) or not os.path.isdir(LOCAL_FOLDER):
@@ -115,7 +114,11 @@ def main():
 
 
 if __name__ == "__main__":
-    while True:
-        main()
-        interval_seconds = int(SYNC_PERIOD)
-        time.sleep(interval_seconds)
+    try:
+        while True:
+            main()
+            interval_seconds = int(SYNC_PERIOD)
+            time.sleep(interval_seconds)
+    except KeyboardInterrupt:
+        print("\nПрограмма остановлена пользователем.")
+        logging.info(f"Программа остановлена пользователем")
