@@ -1,5 +1,6 @@
 import requests
 import os
+import logging
 
 class Sync:
     """
@@ -47,7 +48,7 @@ class Sync:
             upload_response = requests.put(upload_url, data=f)
             upload_response.raise_for_status()
 
-        print(f"Файл {local_path} загружен в {remote_path}")
+        logging.info(f"Файл {local_path} загружен в {remote_path}")
 
 
     def reload(self, local_path: str) -> None:
@@ -58,7 +59,7 @@ class Sync:
                 local_path (str): Полный путь к локальному файлу.
             """
         self.load(local_path)
-        print(f"Файл {os.path.basename(local_path)} перезаписан в удалённом хранилище")
+        logging.info(f"Файл {os.path.basename(local_path)} перезаписан в удалённом хранилище")
 
 
     def delete(self, filename: str) -> bool:
@@ -75,10 +76,10 @@ class Sync:
         params = {"path": remote_path}
         response = requests.delete(self.api_url, headers=self.headers, params=params)
         if response.status_code == 204:
-            print(f"Файл {filename} успешно удалён из {self.remote_folder}")
+            logging.info(f"Файл {filename} успешно удалён из {self.remote_folder}")
             return True
         else:
-            print(f"Ошибка при удалении файла {filename}: {response.status_code} - {response.text}")
+            logging.info(f"Ошибка при удалении файла {filename}: {response.status_code} - {response.text}")
             return False
 
     def get_info(self):
