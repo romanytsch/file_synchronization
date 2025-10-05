@@ -3,6 +3,7 @@ import logging
 import time
 from storage_algorithm import Sync
 from config import TOKEN, YANDEX_DISK_PATH, LOCAL_FOLDER, LOG_PATH, SYNC_PERIOD
+from errors import SyncError
 
 logging.basicConfig(
     filename=LOG_PATH if LOG_PATH else 'sync.log',
@@ -25,8 +26,7 @@ def main():
     if not os.path.exists(LOCAL_FOLDER) or not os.path.isdir(LOCAL_FOLDER):
         msg = f"Локальная директория не найдена: {LOCAL_FOLDER}"
         logging.error(msg)
-        print(msg)
-        return
+        return None
 
     sync = Sync(TOKEN, YANDEX_DISK_PATH)
 
@@ -34,14 +34,13 @@ def main():
         items = sync.get_info()
         remote_files = {item['name']: item for item in items if 'name' in item}
         logging.info(f"Удалённые файлы: {list(remote_files.keys())}")
-    except Exception as e:
-        msg = f"Ошибка доступа к Яндекс.Диску: {e}"
+    except Exception as ex:
+        msg = f"Ошибка доступа к Яндекс.Диску: {ex}"
         logging.error(msg)
-        print(msg)
-        return
+        return None
 
-    local_files = {f: os.path.getsize(os.path.join(LOCAL_FOLDER, f))
-                   for f in os.listdir(LOCAL_FOLDER) if os.path.isfile(os.path.join(LOCAL_FOLDER, f))}
+    local_files = {file: os.path.getsize(os.path.join(LOCAL_FOLDER, file))
+                   for file in os.listdir(LOCAL_FOLDER) if os.path.isfile(os.path.join(LOCAL_FOLDER, file))}
     logging.info(f"Локальные файлы: {list(local_files.keys())}")
 
     local_names = set(local_files.keys())
@@ -55,8 +54,8 @@ def main():
         try:
             sync.load(local_path)
             logging.info(f"Файл {filename} загружен или обновлён")
-        except Exception as e:
-            logging.error(f"Ошибка загрузки файла {filename}: {e}")
+        except Exception as ex:
+            logging.error(f"Ошибка загрузки файла {filename}: {ex}")
 
     # Обработка удаления (файлы, которые есть в удалённом, но отсутствуют локально)
     files_to_delete = remote_names - local_names
@@ -67,8 +66,8 @@ def main():
                 logging.info(f"Файл {filename} удалён из облака")
             else:
                 logging.error(f"Не удалось удалить файл {filename} из облака")
-        except Exception as e:
-            logging.error(f"Ошибка удаления файла {filename}: {e}")
+        except Exception as ex:
+            logging.error(f"Ошибка удаления файла {filename}: {ex}")
 
     logging.info("Синхронизация завершена")
 
@@ -83,4 +82,4 @@ if __name__ == "__main__":
             time.sleep(interval_seconds)
             main()
     except KeyboardInterrupt:
-        print("Программа завершена пользователем")
+        logging.info("Программа завершена пользователем")
