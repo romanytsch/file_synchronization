@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  sync_service:
+    build: .
+    container_name: yandex_file_sync
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    restart: unless-stopped
